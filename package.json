@@ -1,0 +1,18 @@
+{
+  "dependencies": {
+    "two": "^1.0.7",
+    "two.js": "^0.8.14",
+    "vite": "^5.4.8"
+  },
+  "name": "fourierdraw",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "author": "Divyam",
+  "license": "ISC",
+  "description": ""
+}
