@@ -69,16 +69,34 @@ function drawSignal(two, rotTestX, rotTestY, masterGroup, localRotX,localRotY, l
 
 }
 
+// function resizeCanvas(two) {
+//   two.width = window.innerWidth;
+//   two.height = window.innerHeight;
+//   two.update();
+// }
+
+
+
 // const drawSignalBound =  drawSignal.bind(this, two, rotTestX, rotTestY, masterGroup, localRotX,localRotY, lineTest, graphPoints, circleTest, numCycles);
 
 function renderHeading(two)
 {
-  const text = two.makeText('Fourier Draw!', window.screen.width/2, 200); // Text, x, y position
+  const text = two.makeText('Fourier Draw!', window.screen.width/2, 200/960 * window.screen.height); 
 
-text.fill = 'black';       // Set text color
-text.size = 64;            // Set font size
+text.fill = 'black';       
+if(isMobileDevice())
+{
+  text.size = 32;  
+  text.translation.set( window.innerWidth/2,  200/960 * window.innerHeight)
+}
+else
+{
+  text.size = 64;
+}
+
+            
 text.style = "italic"
-text.alignment = 'center'; // Align the text to the center
+text.alignment = 'center'; 
 return text;
 }
 
@@ -119,14 +137,9 @@ function createElement(two, pos, numCycles=5)
   renderHeading(two);
 
 
-  // let rad = 50
-
-  // let initFlag = false;
   let x = 0;
   let y = 0;
 
-  // let rotCenterX = pos[0];
-  // let rotCenterY = pos[1];
 
   let translateX = 0;
   let translateY = 0;
@@ -137,7 +150,6 @@ function createElement(two, pos, numCycles=5)
   const group0 = two.makeGroup();
   group0.translation.set(pos[0], pos[1])
 
-  // let numCycles = 5;
   const groupArray = []
 
   // groupArray.push(group0);
@@ -184,23 +196,6 @@ function createElement(two, pos, numCycles=5)
     line2.position.set(prevX,  prevY); 
 
 
-    // circle 2 is the ddot in the end
-
-    let circle2 = two.makeCircle(0, 0, 2)
-    circle2.fill =  '#aF8F00';
-    circle2.stroke = 'blue';
-    circle2.linewidth = 2;
-    circle2.opacity = 0.4
-
-
-    circle2.position.set(radius,0)
-    
-
-    // // update for line
-    // two.bind("update", function() {
-    //   update(group); 
-    // } )
-
   }
 
   let masterGroup = []
@@ -229,79 +224,15 @@ function createElement(two, pos, numCycles=5)
   let localRotY = masterGroup.map(elem => elem.children[0].position.y); 
 
 
-  let lineTest = two.makeLine(rotTestX, rotTestX, 550 +  localRotX.reduce((acc, curr) => acc + curr, 0), 
-      500 + localRotY.reduce((acc, curr) => acc + curr, 0))
+
+  let lineTest = two.makeLine(rotTestX, rotTestY, pos[0] + 50 +  localRotX.reduce((acc, curr) => acc + curr, 0), 
+    pos[1] + localRotY.reduce((acc, curr) => acc + curr, 0))
 
   let drawSignalBound =  drawSignal.bind(this, two, rotTestX, rotTestY, masterGroup, localRotX,localRotY, lineTest, graphPoints, circleTest, numCycles);
+
   boundFuncs.push(drawSignalBound);
   two.bind("update", drawSignalBound);
 
-  // two.bind("update", function() 
-  // {
-
-
-  //   rotTestX = masterGroup[0].parent.position.x;
-  //   rotTestY = masterGroup[0].parent.position.y;
-
-  //   let accum = 0;
-  //   for (let i = 0; i < numCycles ; i++)
-  //   {
-  //     let n = (i * 2) + 1 ;
-  //     let k = n - 2;
-
-  //       let tempTestX = localRotX[i]
-  //       let tempTestY = localRotY[i]
-  
-  //       localRotX[i] =  Math.cos( k * 0.02) * tempTestX - (Math.sin(k * 0.02) * tempTestY);
-  //       localRotY[i] =  Math.sin( k * 0.02) * tempTestX + (Math.cos(k * 0.02) * tempTestY);
-
-
-  //     accum = k ; 
-
-  //     rotTestX = rotTestX + localRotX[i]; 
-  //     rotTestY = rotTestY + localRotY[i]; 
-
-  //    }
-     
-
-  //   lineTest.vertices[0].x = rotTestX; 
-  //   lineTest.vertices[0].y =  rotTestY; 
-  //   lineTest.vertices[1].y =  rotTestY; 
-
-  //   let graphPoint = two.makeCircle(lineTest.vertices[1].x, rotTestY, 1) ;
-
-  //   // graphPoint.fill =  '#AF2342';
-  //   graphPoint.stroke = '#AF2342';
-  //   // graphPoint.linewidth = 0.1;
-  //   // graphPoint.noStroke(); 
-  //   graphPoint.opacity = 1;
-
-  //   graphPoints.push(graphPoint);
-
-  //   for (let point of graphPoints)
-  //   {
-  //     point.translation.set(point.translation.x+1, point.translation.y)
-  //   }
-
-  //   if(graphPoints.length > 900)
-  //   {
-  //     const removedCircle = graphPoints.shift(); 
-  //     two.remove(removedCircle); 
-
-  //   }
-
-  //   circleTest.translation.set(rotTestX, rotTestY);
-
-  //   circleTest.fill =  '#000000';
-  //   circleTest.stroke = 'black';
-  //   circleTest.linewidth = 1;
-  //   circleTest.opacity = 0.5;
-
-  // } )
-
-  // // two.bind("update", function() {
-  // //   update(masterGroup[2], 0.02 ); 
-  // // } )
 
 
     two.bind("update", function() 
@@ -335,6 +266,16 @@ function mainFunc()
   let params = { fullscreen: true};
   let elem = document.getElementById("content");
   let two = new Two(params).appendTo(elem)
+  
+  // two.width = window.innerWidth; 
+  // two.height = window.innerHeight; 
+
+  // console.log("window.innerWidth: ", window.innerWidth)
+  // console.log("window.width: ", window.screen.width)
+  // console.log("window.width: ", two.width)
+
+  two.renderer.domElement.setAttribute('viewBox', `0 0 ${two.width} ${two.height}`);
+
   // elem.style.backgroundColor = '#000000';
   document.body.style.backgroundColor = "lightblue"
 
@@ -346,18 +287,33 @@ function mainFunc()
   slider.min = 1;
   slider.max = 50;
   slider.value = 10;
-  slider.style.position = 'absolute';
+  slider.style.position = 'relative';
 
   slider.style.top = text.translation.y+50 + "px";
   slider.style.left = text.translation.x + "px";
   document.body.appendChild(slider);
 
 
+  if( isMobileDevice() )
+  {
+    createElement(two, [500 / 1707 * window.innerWidth,   500/960 * window.innerHeight, 60], slider.value);
+  }
+  else
+  {
+    createElement(two, [500 / 1707 * window.screen.width, 500/960 * window.screen.height, 120], slider.value);    
+
+  }
 
 
-  createElement(two, [500,500,120], slider.value);
+  // createElement(two, [500 , 500, 120], slider.value);
   two.play();
   // two.unbind();
+
+
+  window.addEventListener('resize', () => 
+    {
+      updateSliderPosition(two, slider, text);
+  });
   
   
   slider.addEventListener( 'input',  function (event) 
@@ -366,12 +322,53 @@ function mainFunc()
       two.pause();
       two.unbind("update", boundFuncs[0]);
       boundFuncs.pop();
-      createElement(two, [500,500,120], slider.value);
+      // createElement(two, [500,500,120], slider.value);
+
+      // if( (window.screen.width < 1200) || (window.screen.height < 1200) )
+
+      if( isMobileDevice() )
+      {
+        createElement(two, [500 / 1707 * window.innerWidth,   500/960 * window.innerHeight, 60], slider.value);
+      }
+      else
+      {
+        createElement(two, [500 / 1707 * window.screen.width, 500/960 * window.screen.height, 120], slider.value);    
+
+      }
       two.play();
     
     },
     false
   );
+}
+
+function isMobileDevice() 
+{
+  return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
+
+
+function updateSliderPosition(two, slider, text) 
+{
+
+  // console.log("window.screen.width/2, 200: ", window.screen.width)
+
+ 
+  // console.log("text.translation.y: ", text.translation.y)
+  // console.log("text.translation.x ", text.translation.x)
+  // console.log("two.width: ", two.width)
+  // console.log("two.height: ", two.height)
+
+  // let xynew = mapToScreenWithViewBox(two, text.translation.x, text.translation.y + 50);
+
+  // console.log("xy new: ", xynew.x, xynew.y)
+
+  const topPos = (250 / window.screen.height) * two.height;
+
+  slider.style.top = topPos + "px";
+  slider.style.left = two.width/2 +  "px";
+
 }
 
 
@@ -383,5 +380,28 @@ function mainFunc()
 // console.log(dft(y));
 
 
+// function mapToScreenWithViewBox(two, x, y) 
+// {
+//   const canvasRect = two.renderer.domElement.getBoundingClientRect(); // Canvas screen position
+//   const viewBox = two.renderer.domElement.getAttribute('viewBox').split(' ').map(Number);
+
+//   const viewBox2 = two.renderer.domElement.getAttribute('viewBox');
+
+//   console.log("viewBox2: ", viewBox2)
+
+//   const [viewX, viewY, viewWidth, viewHeight] = viewBox;
+
+//   console.log("viewX, viewY, viewWidth, viewHeight: ", viewX, viewY, viewWidth, viewHeight)
+
+//   // Scale factors between viewBox and canvas size
+//   const scaleX = canvasRect.width / viewWidth;
+//   const scaleY = canvasRect.height / viewHeight;
+
+//   // Convert Two.js coordinates to screen coordinates
+//   const screenX = canvasRect.left + (x - viewX) * scaleX;
+//   const screenY = canvasRect.top + (y - viewY) * scaleY;
+
+//   return { x: screenX, y: screenY };
+// }
 
 mainFunc();
